@@ -7,7 +7,7 @@ Should absolutely support Windows, Linux, and OSX. (But only tested on Windows, 
 
 # Performance
 
-Particular attention was paid towards performance so that the tool can be used interactively! It can scan ~6000  C-Sharp files in a large project in under a second. Queries are executed in parallel across all CPU cores. That said, there is still a lot of low hanging fruit if you need this to be even faster (see todos).
+Particular attention was paid towards performance so that the tool can be used interactively. It can scan ~6000  C-Sharp files in a large project in under a second. Queries are executed in parallel across all CPU cores. That said, there is still a lot of low hanging fruit if you need this to be even faster (see todos).
 
 # Usage
 
