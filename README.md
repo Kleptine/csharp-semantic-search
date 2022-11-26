@@ -31,12 +31,14 @@ You can find the Tree Sitter query string documentation [here](https://tree-sitt
 my_tree_sitter_node.to_sexp()
 ```
 
+Keep in mind that Tree Sitter doesn't compile C#, it only parses the AST. You can't query for type information or call graphs, only match structural patterns.
+
 You can also compile this to a static executable via `cargo build --release`.
 
 
 # Example:
 
-A more complex example (note: this uses powershell string quoting).
+A more complex example. This finds all classes that extend at least one parent, which contain at least one field where the first modifier is not 'public'. (note: this uses powershell string quoting).
 ```bash
 cargo run --release -- D:\Projects\EcsEngine "(class_declaration name: (identifier) bases: (base_list (identifier) @parent) body: (declaration_list (field_declaration . (modifier) @modifier) @field (#not-eq? @modifier ""public"")))"'
 ```
