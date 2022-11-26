@@ -3,6 +3,8 @@ An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](ht
 
 This is not really a general tool. It's more like a bash script. The code is only 100~ lines, and output is not formatted with any meaningful intention. Customize it to your needs! 
 
+Should absolutely support Windows, Linux, and OSX. (But only tested on Windows, 🙇🏻‍♂️)
+
 # Performance
 
 Particular attention was paid towards performance so that the tool can be used interactively! It can scan ~6000 large C-Sharp files in under a second. Queries are executed in parallel across all CPU cores. 
@@ -25,7 +27,6 @@ my_tree_sitter_node.to_sexp()
 
 You can also compile this to a static executable via `cargo build --release`.
 
-Should absolutely support Windows, Linux, and OSX. (But only tested on Windows, 🙇🏻‍♂️)
 
-# Example (In Powershell):
+# Example:
 `cargo run --release -- D:\Projects\EcsEngine "(class_declaration name: (identifier) bases: (base_list (identifier) @parent) body: (declaration_list (field_declaration . (modifier) @modifier) @field (#not-eq? @modifier ""public"")))"'`
