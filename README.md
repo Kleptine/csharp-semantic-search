@@ -1,4 +1,4 @@
-# csharp-semantic-grep
+# csharp-semantic-search
 An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns.
 
 This is not really a general tool. It's more like a bash script. The code is only 100~ lines, and output is not formatted with any meaningful intention. Customize it to your needs! 
