@@ -1,0 +1,16 @@
+[package]
+name = "tree-search"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.0.26", features = ["derive"] }
+tree-sitter="0.20.9"
+walkdir="2.3.2"
+anyhow={ version="1.0.66", features = ["backtrace"] }
+rayon="1.6.0"
+
+[build-dependencies]
+cc="*"
