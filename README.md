@@ -1,5 +1,5 @@
 # csharp-semantic-search
-An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns.
+An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns. Tree sitter parses the AST, and is great for textual queries (ie. find all classes with field xyz that has modifier abc), but doesn't understand type information or call graphs.
 
 This is not really a general tool. It's more like a bash script. The code is only 100~ lines, and output is not formatted with any meaningful intention. Customize it to your needs! 
 
