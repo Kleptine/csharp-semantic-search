@@ -9,7 +9,7 @@ Particular attention was paid towards performance so that the tool can be used i
 
 # Usage
 
-First make sure you have Rust and Cargo toolchains installed (see the [one-liner](https://www.rust-lang.org/tools/install)). You will also need to install the default C compilation toolchain for your platform, as tree sitter operates by generating a C-based parser, under the hood.
+First make sure you have Rust and Cargo toolchains installed (see the [one-liner](https://www.rust-lang.org/tools/install)). You will also need to install the default C compilation toolchain for your platform, as tree sitter operates by generating a C-based parser, under the hood. That said, there is still a lot of low hanging fruit if you need this to be even faster (see todos).
 
 Then:
 
