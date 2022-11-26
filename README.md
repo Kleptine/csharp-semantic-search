@@ -35,4 +35,8 @@ You can also compile this to a static executable via `cargo build --release`.
 
 
 # Example:
+
+A more complex example (note: this uses powershell string quoting).
 `cargo run --release -- D:\Projects\EcsEngine "(class_declaration name: (identifier) bases: (base_list (identifier) @parent) body: (declaration_list (field_declaration . (modifier) @modifier) @field (#not-eq? @modifier ""public"")))"'`
+
+
