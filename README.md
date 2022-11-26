@@ -1,7 +1,11 @@
 # csharp-semantic-grep
 An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns.
 
-This is not really a general tool, more of a quick example. The code is only 100~ lines, and is very easy to customize to your needs.
+This is not really a general tool. It's more like a bash script. The code is only 100~ lines, and output is not formatted with any meaningful intention. Customize it to your needs! 
+
+# Performance
+
+Queries are executed in parallel across all CPU cores. It can parse ~6000 C-Sharp files in just under a second. 
 
 # Usage
 
