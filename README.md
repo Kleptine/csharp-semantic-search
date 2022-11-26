@@ -5,7 +5,7 @@ This is not really a general tool. It's more like a bash script. The code is onl
 
 # Performance
 
-Particular attention was paid towards performance so that the tool can be used interactively! It can parse ~6000 C-Sharp files in just under a second. Queries are executed in parallel across all CPU cores. 
+Particular attention was paid towards performance so that the tool can be used interactively! It can scan ~6000 large C-Sharp files in under a second. Queries are executed in parallel across all CPU cores. 
 
 # Usage
 
