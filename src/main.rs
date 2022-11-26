@@ -1,21 +1,19 @@
 //! A simple CLI that matches tree-sitter queries against CSharp files in a directory.
 //!
-//! Note that this is far from being a "shippable" tool. You should approach this more like 
+//! Note that this is far from being a "shippable" tool. You should approach this more like
 //! a bash script you can tweak to your needs. At the bottom is space for adding custom filtering logic,
 //! if you need additional filtering in addition to the tree-sitter query language.
 
 use std::{
     collections::{HashMap, HashSet},
-    error::Error,
-    fs::{self, File},
-    future,
+    fs::{self},
     path::PathBuf,
     sync::{atomic::AtomicIsize, Mutex},
 };
 
 use rayon::prelude::*;
 use tree_sitter::{Language, Query, QueryCapture, QueryCursor};
-use walkdir::{DirEntry, WalkDir};
+use walkdir::{WalkDir};
 
 use clap::Parser;
 
@@ -31,10 +29,12 @@ struct Args {
 }
 
 // A counter to track total matches found in the searched files.
-static total_count: AtomicIsize = AtomicIsize::new(0);
+static TOTAL_COUNT: AtomicIsize = AtomicIsize::new(0);
 
 fn main() {
-    let mut output_text = Mutex::new(Vec::new()); // Buffer the lines written to the standard out to avoid lock contention of println!(). 
+    // Buffer the lines written to the standard out to avoid lock contention of println!().
+    // todo(perf): We make squeeze out some extra performance by replacing this with a parallel append-only data structure.
+    let output_text = Mutex::new(Vec::new()); 
 
     let language = unsafe { tree_sitter_c_sharp() };
 
@@ -42,9 +42,10 @@ fn main() {
     let full_pattern = format!("{} @full_pattern_cli_capture", args.pattern); // Add an extra root pattern to force capturing the root pattern for display.
 
     // The final query built from the user's string.
-    let query = Query::new(language, &full_pattern).expect("Error building query from given string.");
+    let query =
+        Query::new(language, &full_pattern).expect("Error building query from given string.");
 
-    // Scan the entire directory *first*, so that we can more easily split the work among worker threads later. 
+    // Scan the entire directory *first*, so that we can more easily split the work among worker threads later.
     let mut paths = Vec::new();
     for entry in WalkDir::new(args.path).into_iter() {
         let path = entry.unwrap().into_path();
@@ -59,7 +60,8 @@ fn main() {
     // Divide the files to be searched into equal portions and send to worker threads, via rayon's par_iter.
     paths.par_iter().for_each(|path| {
         if let Err(e) = parse_file(&path, &query, &output_text) {
-            output_text.lock()
+            output_text
+                .lock()
                 .unwrap()
                 .push(format!("Skipping [{}] [{}]", path.display(), e));
         }
@@ -71,7 +73,7 @@ fn main() {
 
     println!(
         "\nFound {} total results.",
-        total_count.load(std::sync::atomic::Ordering::SeqCst)
+        TOTAL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
     );
 }
 
@@ -81,7 +83,6 @@ fn parse_file(
     query: &Query,
     out: &Mutex<Vec<String>>,
 ) -> Result<(), anyhow::Error> {
-
     // Unsafe: Tree Sitter uses a C FFI, so we need unsafe to access the generated C library.
     let language = unsafe { tree_sitter_c_sharp() };
 
@@ -102,7 +103,6 @@ fn parse_file(
     let mut seen_nodes: HashSet<usize> = HashSet::new();
 
     for m in cursor.matches(query, root_node, source_bytes) {
-
         let captures: HashMap<_, _> = m
             .captures
             .iter()
@@ -111,44 +111,55 @@ fn parse_file(
 
         // This is the capture we added above so we can access the root node of the query match.
         let full_capture = captures["full_pattern_cli_capture"];
-        
+
         if seen_nodes.contains(&full_capture.node.id()) {
             continue; // Don't consider at the same node twice. Sometimes the same node can match multiple times.
         }
         seen_nodes.insert(full_capture.node.id());
 
-        total_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        TOTAL_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
 
         //
-        // Custom search filtering goes here:
+        // Custom search filtering can go here:
         //
 
-        // In this case, I'm finding only those matches whose '@parent' capture is 'IComponentData'
+        // For example, I'm finding only those matches whose '@parent' capture is 'IComponentData'
 
-        let parent_capture = captures["parent"];
-        let parent = parent_capture.node.utf8_text(source_bytes).unwrap();
+        // let parent_capture = captures["parent"];
+        // let parent = parent_capture.node.utf8_text(source_bytes).unwrap();
 
-        if parent == "IComponentData" {
-            let found_text = full_capture.node.utf8_text(source_bytes).unwrap();
+        // if parent == "IComponentData" {
+        //     let found_text = full_capture.node.utf8_text(source_bytes).unwrap();
 
-            let mut output = out.lock().unwrap(); // Lock the output mutex here, so we can write these lines together.
-            output.push(format!(
-                "===========================================================\nFound [{}] [{}]\n{}",
-                path.display(),
-                parent,
-                found_text,
-            ));
-            for (capture_name, capture) in &captures {
-                if capture_name == "full_pattern_cli_capture" {
-                    continue;
-                }
-                output.push(format!(
-                    "\tCapture [{}] = [{}]",
-                    capture_name,
-                    capture.node.utf8_text(source_bytes).unwrap()
-                ));
-            }
-        }
+        //     let mut output = out.lock().unwrap(); // Lock the output mutex here, so we can write these lines together.
+        //     output.push(format!(
+        //         "===========================================================\nFound [{}] [{}]\n{}",
+        //         path.display(),
+        //         parent,
+        //         found_text,
+        //     ));
+        //     for (capture_name, capture) in &captures {
+        //         if capture_name == "full_pattern_cli_capture" {
+        //             continue;
+        //         }
+        //         output.push(format!(
+        //             "\tCapture [{}] = [{}]",
+        //             capture_name,
+        //             capture.node.utf8_text(source_bytes).unwrap()
+        //         ));
+        //     }
+        // }
+
+
+        // For now just print all matches:
+
+        // todo(perf): Formatting moves a lot of data around, we could stream these results instead to get better interactivity. Or return a smaller part of the match.
+        let found_text = full_capture.node.utf8_text(source_bytes).unwrap();
+        out.lock().unwrap().push(format!(
+            "===========================================================\nFound [{}] \n{}",
+            path.display(),
+            found_text,
+        ));
     }
     Ok(())
 }
