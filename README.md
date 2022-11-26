@@ -15,7 +15,13 @@ First make sure you have Rust and Cargo toolchains installed (see the [one-liner
 
 Then:
 
-`cargo run --release -- <path_to_dir> "<tree sitter query string>"`
+```bash
+# Pull this repo, with tree sitter c-sharp submodule.
+git clone <this repo>
+git submodule update --init --recursive
+
+cargo run --release -- <path_to_dir> "<tree sitter query string>"
+```
 
 # Notes:
 
