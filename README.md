@@ -26,7 +26,6 @@ my_tree_sitter_node.to_sexp()
 You can also compile this to a static executable via `cargo build --release`.
 
 Should absolutely support Windows, Linux, and OSX. (But only tested on Windows, 🙇🏻‍♂️)
-```
 
 # Example:
 `cargo run --release -- D:\Projects\EcsEngine "(class_declaration name: (identifier) bases: (base_list (identifier) @parent) body: (declaration_list (field_declaration . (modifier) @modifier) @field (#not-eq? @modifier ""public"")))"'`
