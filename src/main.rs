@@ -50,12 +50,12 @@ fn main() {
     for entry in WalkDir::new(args.path).into_iter() {
         let path = entry.unwrap().into_path();
         let path_str = path.to_str().expect("filename was not valid utf-8");
-        if path_str.ends_with(".cs") && !path_str.contains("Test") {
+        if path_str.ends_with(".cs") {
             paths.push(path);
         }
     }
 
-    println!("Searching {} files.", paths.len());
+    println!("Searching {} files.\n", paths.len());
 
     // Divide the files to be searched into equal portions and send to worker threads, via rayon's par_iter.
     paths.par_iter().for_each(|path| {
@@ -63,7 +63,7 @@ fn main() {
             output_text
                 .lock()
                 .unwrap()
-                .push(format!("Skipping [{}] [{}]", path.display(), e));
+                .push(format!("==> Skipping [{}] [{}]", path.display(), e));
         }
     });
 
@@ -154,11 +154,13 @@ fn parse_file(
         // For now just print all matches:
 
         // todo(perf): Formatting moves a lot of data around, we could stream these results instead to get better interactivity. Or return a smaller part of the match.
-        let found_text = full_capture.node.utf8_text(source_bytes).unwrap();
+        // let found_text = full_capture.node.utf8_text(source_bytes).unwrap();
+        let out_text = captures["classname"].node.utf8_text(source_bytes).unwrap();
         out.lock().unwrap().push(format!(
-            "===========================================================\nFound [{}] \n{}",
+            "{} [{}:at byte {}] ",
+            &out_text,
             path.display(),
-            found_text,
+            full_capture.node.start_byte()
         ));
     }
     Ok(())
