@@ -1,5 +1,5 @@
-# csharp-semantic-grep
-An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns.
+# csharp-semantic-search
+An example of a quick Rust CLI to skim CSharp files looking for [Tree Sitter](https://tree-sitter.github.io/tree-sitter/) query patterns. Tree sitter parses the AST, and is great for textual queries (ie. find all classes with field xyz that has modifier abc), but doesn't understand type information or call graphs.
 
 This is not really a general tool. It's more like a bash script. The code is only 100~ lines, and output is not formatted with any meaningful intention. Customize it to your needs! 
 
@@ -7,7 +7,7 @@ Should absolutely support Windows, Linux, and OSX. (But only tested on Windows, 
 
 # Performance
 
-Particular attention was paid towards performance so that the tool can be used interactively! It can scan ~6000  C-Sharp files in a large project in under a second. Queries are executed in parallel across all CPU cores. That said, there is still a lot of low hanging fruit if you need this to be even faster (see todos).
+Particular attention was paid towards performance so that the tool can be used interactively. It can scan ~6000  C-Sharp files in a large project in under a second. Queries are executed in parallel across all CPU cores. That said, there is still a lot of low hanging fruit if you need this to be even faster (see todos).
 
 # Usage
 
@@ -31,12 +31,14 @@ You can find the Tree Sitter query string documentation [here](https://tree-sitt
 my_tree_sitter_node.to_sexp()
 ```
 
+Keep in mind that Tree Sitter doesn't compile C#, it only parses the AST. You can't query for type information or call graphs, only match structural patterns.
+
 You can also compile this to a static executable via `cargo build --release`.
 
 
 # Example:
 
-A more complex example (note: this uses powershell string quoting).
+A more complex example. This finds all classes that extend at least one parent, which contain at least one field where the first modifier is not 'public'. (note: this uses powershell string quoting).
 ```bash
 cargo run --release -- D:\Projects\EcsEngine "(class_declaration name: (identifier) bases: (base_list (identifier) @parent) body: (declaration_list (field_declaration . (modifier) @modifier) @field (#not-eq? @modifier ""public"")))"'
 ```
